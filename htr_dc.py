@@ -3,7 +3,31 @@ import time
 from kadi import events
 from utilities import append_to_array, find_first_after, find_last_before, find_closest
 
-def htr_dc(temp, t_start='1999:204', t_stop=None, on_range=None, off_range=None, name=None, event=None, plot_cycles=False, dur_lim=None):
+def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None, name=None, event=None, dur_lim=None, plot_cycles=False):
+    """This function generates heater cycling metrics based on a nearby  
+    temperature.  Output plots include:
+       - On-time durations
+       - Period
+       - Duty cycle
+       - Cycles per day
+       - Accumulated on-time per day
+       - Accumulated power per day
+       - Time history (optional)
+    
+    Inputs:
+       temp         Thermistor near heater, preferably close to thermostat
+       t_start      Start of timeframe to analyze (default is 2008:001)
+       t_stop       End of timeframe to analyze (default is current time)
+       on_range     Temperature range to constrain identified heater "on" instances 
+       off_range    Temperature range to constrain identified heater "off" instances
+       name         Identifying name of heater
+       event        Significant time for which it is desired to highlight via vertical line
+       dur_lim      Maximum duration for single heater "on" instance
+       plot_cycles  Option to plot time-history, highlighting htr on and off points 
+                    (default is False)
+    
+    Figures will be saved to local directory as 'htr_' + msid + '*.png'
+    """
     
     close('all')
     t0 = time.time()    
