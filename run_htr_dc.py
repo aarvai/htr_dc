@@ -1,14 +1,13 @@
 execfile('htr_dc.py')
 
-#1.  FDM-2 
-#htr_dc('PFDM202T', 57, 64, t_start='2010:075', t_stop='2010:110', name='FDM-2', plot_cycles=True, dur_lim=200*60) #troubleshooting
-#htr_dc('PLINE08T', 58, 71, t_start='2001:001', t_stop='2014:100', name='5133 Line', event='2010:099:16:54:00.000', plot_cycles=False)
-#htr_dc('PLINE01T', 59, 67.2, t_start='2001:001', t_stop='2014:100', name='5105 Line', event='2010:099:16:54:00.000', plot_cycles=False, dur_lim=70*60)
+# MUPS Valve Heaters
+#htr_dc('PM3THV1T', on_range=[58, 63], off_range=[92, 110], name='MUPS-3 Valve')
+#htr_dc('PM4THV1T', on_range=[55, 60], off_range=[94, 110], name='MUPS-4 Valve')
 
-#2.  MUPS Valve Heaters
-htr_dc('PFDM202T', 57, 64, t_start='2010:075', t_stop='2010:110', name='FDM-2', plot_cycles=True, dur_lim=200*60) #troubleshooting
+# RCS Valve Heaters
+#htr_dc('PR1TV02T', on_range=[46, 50], off_range=[86, 95], dur_lim=60*60, name='RCS-1 Valve') #use B because A therm has dropouts
+#htr_dc('PR2TV01T', on_range=[46, 52], off_range=[75, 85], dur_lim=60*60, name='RCS-2 Valve')
+htr_dc('PR3TV01T', on_range=[40, 60], off_range=[70, 90], dur_lim=60*60, name='RCS-3 Valve')
+#htr_dc('PR3TV01T', t_start='2013:101', t_stop='2013:200', on_range=[40, 60], off_range=[70, 90], dur_lim=60*60, name='RCS-3 Valve', plot_cycles=True)
 
-#3.  RCS Valve Heaters
-
-
-#4.  LAE Valve Heaters
+# LAE Valve Heaters
