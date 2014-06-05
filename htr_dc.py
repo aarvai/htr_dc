@@ -1,9 +1,10 @@
 import time
 
 from kadi import events
+
 from utilities import append_to_array, find_first_after, find_last_before, find_closest
 
-def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None, name=None, event=None, dur_lim=None, plot_cycles=False):
+def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None, name=None, event=None, dur_lim=None, plot_cycles=False, logfile='htr_dc_log.txt'):
     """This function generates heater cycling metrics based on a nearby  
     temperature.  Output plots include:
        - On-time durations
@@ -140,7 +141,7 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     t_event = array([DateTime(event).secs, DateTime(event).secs])
     
     if plot_cycles == True:
-        figure(1, figsize=(8,2.2)) #- only plot for short timeframes when troubleshooting
+        figure(1, figsize=(6,3)) #- only plot for short timeframes when troubleshooting
         plot_cxctime(x.times, x.vals, mew=0)
         plot_cxctime(x.times, x.vals, 'b*',mew=0)
         plot_cxctime(x.times[htr_on], x.vals[htr_on], 'c*',mew=0, label='Heater On')
@@ -148,20 +149,20 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
         if event != None:
             plot_cxctime(t_event, ylim(),'r:')
         ylabel('deg F')
-        #legend(loc=0)
+        legend(loc=0)
         title(name + ' Heater Cycling per ' + temp)
         tight_layout()
         savefig('htr_' + temp + '_sample_cycles.png')
     
-    figure(2)
+    figure(2, figsize=(6,3))
     hist(dur_each/60, bins=100)
     ylabel('instances')
     xlabel('min')
     title(name + ' Heater On-Time Durations')
     savefig('htr_' + temp + '_on_time_hist.png')
     
-    figure(3)
-    plot_cxctime(t_on, dur_each/60, 'r', alpha=.2, label='Range')
+    figure(3, figsize=(6,3))
+    plot_cxctime(t_on, dur_each/60, 'r', alpha=.2, label='Each Cycle')
     plot_cxctime(t_days[:-1], dur[:-1]/60, 'b', alpha=.5, label='Daily Mean')
     #omit last month in this case due to small sample size
     plot_cxctime(t_mos[:-1], dur_mo_mean[:-1]/60, 'k', label='Monthly Mean')
@@ -171,9 +172,14 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     ylabel('min')
     legend(loc=0)
     savefig('htr_' + temp + '_on_time.png')
+    xlim([DateTime(xlim()[1]-90, format='plotdate').plotdate, xlim()[1]])
+    title(name + ' Heater On-Time (ZOOM)')
+    legend(loc=0)
+    tight_layout()
+    savefig('htr_' + temp + '_on_time_zoom.png')
     
-    figure(4)
-    plot_cxctime(t_on[:-1], per_each/60, 'r', alpha=.2, label='Range')
+    figure(4, figsize=(6,3))
+    plot_cxctime(t_on[:-1], per_each/60, 'r', alpha=.2, label='Each Cycle')
     plot_cxctime(t_days[:-1], per[:-1]/60, 'b', alpha=.5, label='Daily Mean')
     #omit last month in this case due to small sample size
     plot_cxctime(t_mos[:-1], per_mo_mean[:-1]/60, 'k', label='Monthly Mean')
@@ -183,8 +189,12 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     ylabel('min')
     legend(loc=0)
     savefig('htr_' + temp + '_period.png')
-    
-    #figure(5, figsize=(8,4))
+    xlim([DateTime(xlim()[1]-90, format='plotdate').plotdate, xlim()[1]])
+    title(name + ' Heater Period (ZOOM)')
+    legend(loc=0)
+    savefig('htr_' + temp + '_period_zoom.png')
+        
+    #figure(5, figsize=(6,3))
     #as a first-order hold, this plotting is more accurate than fig 6
     #(holds values til the next), but isn't necessary if there's a long
     #timespan.  Disadvantage is the unhelpful x-axis.
@@ -194,8 +204,8 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     #ylabel('%')
     #savefig('htr_' + temp + '_duty_cycle_step.png')
 
-    figure(6, figsize=(8,4))
-    plot_cxctime(t_on[:-1], dc_each, 'r', alpha=.2, label='Range')
+    figure(6, figsize=(6,3))
+    plot_cxctime(t_on[:-1], dc_each, 'r', alpha=.2, label='Each Cycle')
     plot_cxctime(t_days[:-1], dc[:-1], 'b', alpha=.5, label='Daily Mean')
     #omit last month in this case due to small sample size
     plot_cxctime(t_mos[:-1], dc_mo_mean[:-1], 'k', label='Monthly Mean') 
@@ -205,9 +215,13 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     ylabel('%')
     legend(loc=0)
     savefig('htr_' + temp + '_duty_cycle.png')
+    xlim([DateTime(xlim()[1]-90, format='plotdate').plotdate, xlim()[1]])
+    title(name + ' Heater Duty Cycle(ZOOM)')
+    legend(loc=0)
+    savefig('htr_' + temp + '_duty_cycle_zoom.png')
     
-    figure(7)
-    plot_cxctime(t_days[:-1], on_freq[:-1], 'b', alpha=.3, label='Range')
+    figure(7, figsize=(6,3))
+    plot_cxctime(t_days[:-1], on_freq[:-1], 'b', alpha=.3, label='Cycles Per Day')
     #omit last month in this case due to small sample size
     plot_cxctime(t_mos[:-1], on_freq_mo_mean[:-1], 'k', label='Monthly Mean')
     if event != None:    
@@ -215,9 +229,13 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     title(name + ' Heater Cycles Per Day')
     legend(loc=0)
     savefig('htr_' + temp + '_on_freq.png')
+    xlim([DateTime(xlim()[1]-90, format='plotdate').plotdate, xlim()[1]])
+    title(name + ' Heater Cycles Per Day (ZOOM)')
+    legend(loc=0)
+    savefig('htr_' + temp + '_on_freq_zoom.png')
     
-    figure(8)
-    plot_cxctime(t_days[:-1], on_time[:-1]/3600, 'b', alpha=.3, label='Range')
+    figure(8, figsize=(6,3))
+    plot_cxctime(t_days[:-1], on_time[:-1]/3600, 'b', alpha=.3, label='On-Time Per Day')
     #omit last month in this case due to small sample size
     plot_cxctime(t_mos[:-1], on_time_mo_mean[:-1]/3600, 'k', label='Monthly Mean')
     if event != None:    
@@ -226,9 +244,13 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     ylabel('hrs')
     legend(loc=0)
     savefig('htr_' + temp + '_acc_on_time.png')
+    xlim([DateTime(xlim()[1]-90, format='plotdate').plotdate, xlim()[1]])
+    title('Accumulated ' + name + ' Heater On-Time Per Day (ZOOM)')
+    legend(loc=0)
+    savefig('htr_' + temp + '_acc_on_time_zoom.png')
     
-    figure(9, figsize=(8,3))
-    plot_cxctime(t_days[:-1], acc_pwr[:-1], 'b', alpha=.3, label='Range')
+    figure(9, figsize=(6,3))
+    plot_cxctime(t_days[:-1], acc_pwr[:-1], 'b', alpha=.3, label='Power Per Day')
     #omit last month in this case due to small sample size
     plot_cxctime(t_mos[:-1], acc_pwr_mo_mean[:-1], 'k', label='Monthly Mean')
     if event != None:    
@@ -237,18 +259,33 @@ def htr_dc(temp, t_start='2008:001', t_stop=None, on_range=None, off_range=None,
     ylabel('W-hrs')
     legend(loc=0)
     savefig('htr_' + temp + '_acc_pwr.png')
-    xlim([DateTime(xlim()[1]-60, format='plotdate').plotdate, xlim()[1]])
+    xlim([DateTime(xlim()[1]-90, format='plotdate').plotdate, xlim()[1]])
+    title('Accumulated ' + name + ' Heater Power Per Day (ZOOM)')
+    legend(loc=0)
     savefig('htr_' + temp + '_acc_pwr_zoom.png')
     
-    print('Processing times:')
-    print(str(t1 - t0) + ' - fetching data')
-    print(str(t2 - t1) + ' - find htr on and off times')
-    print(str(t3 - t2) + ' - find matching cycles')
-    print(str(t4 - t3) + ' - compute dur_each and power')
-    print(str(t5 - t4) + ' - calendar bookkeeping')
-    print(str(t6 - t5) + ' - compute stats')
-    print(str(time.time() - t6) + ' - plots')
+    if logfile == None:
+        print('Processing times for ' + temp + ':')
+        print(str(t1 - t0) + ' - fetching data')
+        print(str(t2 - t1) + ' - find htr on and off times')
+        print(str(t3 - t2) + ' - find matching cycles')
+        print(str(t4 - t3) + ' - compute dur_each and power')
+        print(str(t5 - t4) + ' - calendar bookkeeping')
+        print(str(t6 - t5) + ' - compute stats')
+        print(str(time.time() - t6) + ' - plots')
+        print('Updated through:  ' + DateTime(x.times[-1]).date)
+        print('Processing completed at:  ' + DateTime().date)
+        print(' ')
+    else:
+        f = open(logfile, 'a')
+        f.write(temp + ' updated through ' + DateTime(x.times[-1]).date + ', completed at ' + DateTime().date + '\n')
+        f.close()
+        f2 = open('updated_thru.html', 'w')
+        f2.write('<font face="sans-serif" size=4> \n')
+        f2.write(DateTime(x.times[-1]).date)
+        f2.close()    
 
+    
 
 
     
