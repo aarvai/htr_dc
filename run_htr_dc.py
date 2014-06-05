@@ -1,16 +1,37 @@
+import glob
+import shutil
+
+import asciitable
+import Ska.engarchive.fetch_eng as fetch
+from Chandra.Time import DateTime
+from Ska.Matplotlib import plot_cxctime, cxctime2plotdate
+from kadi import events
+from astropy.table import Table
+import numpy as np
+import matplotlib.pyplot as plt
+
 execfile('htr_dc.py')
 
 # ----------------------------------------------------------------------------------------------------
-# First round, short timeframes to generate zoomed-in plots with time histories
+# First round:  short timeframes to generate zoomed-in plots with time histories
 # ----------------------------------------------------------------------------------------------------
+
+f = open('htr_dc_log.txt', 'a')
+f.write('\n')
+f.write('\n')
+f.write('\n')
+f.write('------------------------------------------------------------------------------------------------- \n')
+f.write('Starting Processing for Round 1 (past 90 days) at ' + DateTime().date + ' \n')
+f.write('------------------------------------------------------------------------------------------------- \n')
+f.close()
 
 t2 = DateTime().mjd
 t1 = DateTime(t2-90, format='mjd').date
-t2 = DateTime(t2).date
+t2 = DateTime(t2, format='mjd').date
 
 # MUPS Valve Heaters
 # MUPS-1 and MUPS-2 heaters don't cycle
-htr_dc('PM3THV1T', t_start=t1, t_stop=t2, on_range=[58, 63], off_range=[92, 110], name='MUPS-3 Valve', plot_cycles=True)
+htr_dc('PM3THV1T', t_start=t1, t_stop=t2, on_range=[58, 63], off_range=[92, 110], dur_lim=30*60, name='MUPS-3 Valve', plot_cycles=True)
 htr_dc('PM4THV1T', t_start=t1, t_stop=t2, on_range=[55, 60], off_range=[94, 110], name='MUPS-4 Valve', plot_cycles=True)
 
 # RCS Valve Heaters
@@ -26,8 +47,14 @@ htr_dc('PLAEV3AT', t_start=t1, t_stop=t2, on_range=[50, 57], off_range=[65, 70],
 htr_dc('PLAEV2AT', t_start=t1, t_stop=t2, on_range=[55, 65], off_range=[72, 85], dur_lim=60*60, name='LAE-4 Valve', plot_cycles=True) #PLAE2AT and 4AT are switched in the database
 
 # ----------------------------------------------------------------------------------------------------
-# Second round, mission plots
+# Second round:  mission plots
 # ----------------------------------------------------------------------------------------------------
+
+f = open('htr_dc_log.txt', 'a')                                            
+f.write('---------------------------------------------------------------------------------- \n')
+f.write('Starting Processing for Round 2 (mission plots) at ' + DateTime().date + ' \n')
+f.write('---------------------------------------------------------------------------------- \n')
+f.close()
 
 # MUPS Valve Heaters
 # MUPS-1 and MUPS-2 heaters don't cycle
@@ -46,3 +73,8 @@ htr_dc('PLAEV1AT', on_range=[50, 57], off_range=[64, 70], dur_lim=30*60, name='L
 htr_dc('PLAEV3AT', on_range=[50, 57], off_range=[65, 70], dur_lim=120*60, name='LAE-3 Valve')
 htr_dc('PLAEV2AT', on_range=[55, 65], off_range=[72, 85], dur_lim=60*60, name='LAE-4 Valve') #PLAE2AT and 4AT are switched in the database
 
+# Copy all PNGs into web-accessible folder
+for file in glob.glob(r'/home/aarvai/python/htr_dc/*.png'):
+    shutil.copy(file, '/share/FOT/engineering/prop/Heater_Trending/plots')
+shutil.copy('/home/aarvai/python/htr_dc/updated_thru.html', '/share/FOT/engineering/prop/Heater_Trending/plots')
+shutil.copy('/home/aarvai/python/htr_dc/htr_dc_log.txt', '/share/FOT/engineering/prop/Heater_Trending')
